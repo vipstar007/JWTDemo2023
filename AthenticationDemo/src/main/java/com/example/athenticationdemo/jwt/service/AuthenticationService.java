@@ -27,7 +27,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    public LoginResponseDto register(RegisterRequestDto request) {
+    public LoginResponseDto register(RegisterRequestDto request) throws Exception {
         var user = User.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
@@ -36,8 +36,8 @@ public class AuthenticationService {
                 .role(request.getRole())
                 .build();
         var savedUser = repository.save(user);
-        var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
+        var jwtToken = jwtService.generateJwtToken(user.getUsername(),jwtService.privateKey());
+        var refreshToken = jwtService.generateRefeshToken(user.getUsername(),jwtService.privateKey());
         saveUserToken(savedUser, jwtToken);
         return LoginResponseDto.builder()
                 .accessToken(jwtToken)
@@ -45,7 +45,7 @@ public class AuthenticationService {
                 .build();
     }
 
-    public LoginResponseDto authenticate(LoginRequestDto request) {
+    public LoginResponseDto authenticate(LoginRequestDto request) throws Exception {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -54,8 +54,8 @@ public class AuthenticationService {
         );
         var user = repository.findByEmail(request.getEmail())
                 .orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
+        var jwtToken = jwtService.generateJwtToken(user.getUsername(),jwtService.privateKey());
+        var refreshToken = jwtService.generateRefeshToken(user.getUsername(),jwtService.privateKey());
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
         return LoginResponseDto.builder()
@@ -89,7 +89,7 @@ public class AuthenticationService {
     public void refreshToken(
             HttpServletRequest request,
             HttpServletResponse response
-    ) throws IOException {
+    ) throws Exception {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;
         final String userEmail;
@@ -98,7 +98,7 @@ public class AuthenticationService {
         }
         refreshToken = authHeader.substring(7);
         // giải mã token trả về userEmail
-        userEmail = jwtService.extractUsername(refreshToken);
+        userEmail = jwtService.extractUsername2(refreshToken,jwtService.publicKey());
         if (userEmail != null) {
             var user = this.repository.findByEmail(userEmail)
                     .orElseThrow();

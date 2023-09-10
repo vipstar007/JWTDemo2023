@@ -35,6 +35,7 @@ public class SecurityConfiguration {
                 .disable()
                 .authorizeHttpRequests()
                 .requestMatchers(
+
                         "/api/v1/auth/**",
                         "/v2/api-docs",
                         "/v3/api-docs",
@@ -45,7 +46,8 @@ public class SecurityConfiguration {
                         "/configuration/security",
                         "/swagger-ui/**",
                         "/webjars/**",
-                        "/swagger-ui.html"
+                        "/swagger-ui.html",
+                        "/keycloak/auth/**"
                 )
                 .permitAll()
 

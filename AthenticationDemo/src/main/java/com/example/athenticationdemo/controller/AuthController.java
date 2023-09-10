@@ -25,13 +25,23 @@ public class AuthController {
             @RequestBody RegisterRequestDto request
     ) {
 
-        return ResponseEntity.ok(service.register(request));
+        try {
+            return ResponseEntity.ok(service.register(request));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
     @PostMapping("/authenticate")
     public ResponseEntity<LoginResponseDto> authenticate(
             @RequestBody LoginRequestDto request
-    ) {
-        return ResponseEntity.ok(service.authenticate(request));
+    ) throws Exception {
+        try {
+            return ResponseEntity.ok(service.authenticate(request));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     @PostMapping("/refresh-token")
@@ -39,7 +49,12 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
-        service.refreshToken(request, response);
+        try {
+            service.refreshToken(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 }
 
