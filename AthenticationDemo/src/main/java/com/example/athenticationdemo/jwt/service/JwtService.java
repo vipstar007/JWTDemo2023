@@ -147,15 +147,17 @@ public String extractUsername2(String token, PublicKey publicKey) {
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
+    public boolean isTokenValid(String token, UserDetails userDetails) throws Exception {
+        final String username = extractUsername2(token,this.publicKey());
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    private boolean isTokenExpired(String token) throws Exception {
+        return extractExpiration2(token).before(new Date());
     }
-
+    private Date extractExpiration2(String token) throws Exception {
+        return extractClaim2(token, Claims::getExpiration,this.publicKey());
+    }
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
