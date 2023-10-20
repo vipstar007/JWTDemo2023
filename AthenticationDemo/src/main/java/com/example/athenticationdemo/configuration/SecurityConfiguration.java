@@ -47,7 +47,8 @@ public class SecurityConfiguration {
                         "/swagger-ui/**",
                         "/webjars/**",
                         "/swagger-ui.html",
-                        "/keycloak/auth/**"
+                        "/keycloak/auth/**",
+                        "/api/airport/**"
                 )
                 .permitAll()
 
